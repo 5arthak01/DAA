@@ -1,13 +1,11 @@
 # DAA
 DAA project of Team sqLITE
 
+[Phase1 submission](/phase1_ver1.pdf)
 [ER diagram](/sqLITE_ProjectPhase2.pdf)
 
 ----------------------------------------------------------------
 [Phase-1 requirements](/ProjectPhase1.pdf)
-
-[Phase1 submission](/phase1_ver1.pdf)
-
 
 The ER diagram is a huge aid in explanation.
 
