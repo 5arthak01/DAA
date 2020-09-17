@@ -3,7 +3,7 @@ DAA project of Team sqLITE
 
 * [Phase1 submission](/phase1_ver1.pdf)
 * [ER diagram](/sqLITE_ProjectPhase2.pdf)
-* [Relational Model](/Relational.pdf)
+* [Relational Model](/Relational.png)
 ----------------------------------------------------------------
 [Phase-1 requirements](/ProjectPhase1.pdf)
 
