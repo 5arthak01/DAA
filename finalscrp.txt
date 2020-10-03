@@ -1,0 +1,19 @@
+create table Restaurant (cin_num int not null, name varchar(20), primary key(cin_num));
+create table Recipe (Recipe_name varchar(20) not null, Ingredients varchar(255) not null,primary key(Recipe_name));
+create table Branch (Res int not null,Branch_id int not null,primary key(branch_id), foreign key(res) references Restaurant(cin_num));
+create table Dish (Dish_name varchar(20) not null, Price int not null,foreign key(Dish_name) references Recipe(Recipe_name));
+create table Dish_meal (Dish_name varchar(20) not null, Meal varchar(20) not null,foreign key(Dish_name) references Dish(Dish_name));
+create table Employee(Employee_id varchar(20) not null,Branch_id int not null,Super_id int not null,Res int not null,primary key(Employee_id),foreign key(Branch_id) references Branch(Branch_id),foreign key(Res) references Branch(Res));
+create table Manager(Manager_id varchar(20) not null,foreign key(Manager_id) references Employee(Employee_id));
+create table Waiter(Waiter_id varchar(20) not null,foreign key(Waiter_id) references Employee(Employee_id));
+create table Chef(Chef_id varchar(20) not null,Position varchar(20),foreign key(Chef_id) references Employee(Employee_id));
+create table Customers(Phone char(10) not null,CONSTRAINT chk_phone CHECK (phone not like '%[^0-9]%'),Time datetime, primary key(Phone,Time));
+create table Feedback(Waiter_id varchar(20),Chef_id varchar(20),Dish_name varchar(20),Phone char(10),Time datetime,Suggestion varchar(255),Rating int not null,CHECK (Rating>= 0 and Rating <=10), foreign key(Waiter_id) references Waiter(Waiter_id),foreign key(Chef_id) references Chef(Chef_id),foreign key(Dish_name) references Dish(Dish_name),foreign key(Phone,Time) references Customers(Phone,Time));
+alter table Waiter add primary key(Waiter_id);
+alter table Manager add primary key(Manager_id);
+alter table Chef add primary key(Chef_id);alter table Chef modify position varchar(20) not null;
+alter table Dish add primary key(Dish_name);
+alter table Dish_meal add primary key(Dish_name);
+alter table Dish add check (price>0);
+alter table Feedback add primary key(Waiter_id,Chef_id,Dish_name,Phone,Time);
+
