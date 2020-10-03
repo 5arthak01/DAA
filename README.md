@@ -1,7 +1,7 @@
 # DAA
 DAA project of Team sqLITE
 
-* [Phase1 submission](/sqLite.pdf)
+* [Phase1 submission](/sqLITE.pdf)
 * [ER diagram](/sqLITE_ProjectPhase2.pdf)
 * [Relational Model](/Relational.png)
 * [Phase3](/Sqlite_Phase3.pdf)
