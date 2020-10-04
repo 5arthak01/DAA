@@ -84,7 +84,7 @@ def avgRating(): # Finds average rating for given Employee
     try:
         employee = input("Enter Employee ID: ").strip()
 
-        cur.execute("SELECT Rating FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s", (dish, dish))        
+        cur.execute("SELECT Rating FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s", (employee, employee))        
         rows = cur.fetchall()
         if len(rows):
             print("The Average rating for Employee ", employee, " is " , str(sum(rows)/len(rows)))
