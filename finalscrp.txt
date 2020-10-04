@@ -17,3 +17,18 @@ alter table Dish_meal add primary key(Dish_name);
 alter table Dish add check (price>0);
 alter table Feedback add primary key(Waiter_id,Chef_id,Dish_name,Phone,Time);
 
+insert into Restaurant values (557623,"Pizza Hut");
+insert into Branch values (557623,123),(557623,391);
+insert into Recipe values ("Steak","beef,butter,garlic,oil,salt"),("Onion Rings","onion,salt,oil,egg,bread crumbs,flour"),("Veg fried Rice","rice,cabbage,peas,beans,carrot,salt"),("chicken biryani","rice,chicken,onion,chillies,mint,salt"),("brownie","chocolate,butter,egg,flour,sugar,baking powder,ice cream");
+insert into Dish values ("Steak",600),("Onion Rings",200),("Veg fried Rice",300),("chicken biryani",450),("brownie",80);
+insert into Dish_meal values ("Steak","Lunch"),("Steak","Dinner"),("Onion Rings","Snacks"),("Veg Fried Rice","Lunch"),("Veg Fried Rice","Dinner"),("chicken biryani","Dinner"),("brownie","Dessert");
+insert into  Customers values (9999999999,"2020-07-13 20:30:17"),(8888888888,"2020-06-21 13:45:56"),(7777777777,"2020-09-05 12:14:59"),(6666666666,"2020-10-1 21:50:00");
+insert into Employee values ("W11111",123,"M1111",557623),("W11112",123,"M1111",557623),("C11111",123,"M1111",557623),("C11112",123,"M1111",557623),("M1111",123,"M1111",557623),("W33333",391,"M3333",557623),("W33334",391,"M3333",557623),("C33333",391,"M3333",557623),("C33334",391,"M3333",557623),("M3333",391,"M3333",557623);
+insert into Waiter values ("W11111"),("W11112"),("W33333"),("W33334");
+insert into Chef values ("C11111","Head Chef"),("C11112","Sous Chef"),("C33333","Head Chef"),("C33334","Pastry Chef");
+insert into Manager values ("M1111"),("M3333");
+
+
+Additional changes;
+Super_id int -> varchar
+Customers both fields should together form primary key 
