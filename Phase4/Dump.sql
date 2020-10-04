@@ -20,6 +20,7 @@
 --
 
 DROP DATABASE IF EXISTS `Restaurant_Ratings`;
+
 CREATE DATABASE /*!32312 IF NOT EXISTS*/ `Restaurant_Ratings` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
 USE `Restaurant_Ratings`;
@@ -61,7 +62,8 @@ CREATE TABLE `Chef` (
   `Chef_id` varchar(20) NOT NULL,
   `Position` varchar(20) NOT NULL,
   PRIMARY KEY (`Chef_id`),
-  CONSTRAINT `Chef_ibfk_1` FOREIGN KEY (`Chef_id`) REFERENCES `Employee` (`Employee_id`)
+  CONSTRAINT `Chef_ibfk_1` FOREIGN KEY (`Chef_id`) REFERENCES `Employee` (`Employee_id`),
+  CONSTRAINT `Chef_chk_1` CHECK ((((substr(`Chef_id`,1,2) = _utf8mb3'HC') and (`Position` = _utf8mb3'Head Chef')) or ((substr(`Chef_id`,1,2) = _utf8mb3'SC') and (`Position` = _utf8mb3'Sous Chef'))))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -169,8 +171,8 @@ CREATE TABLE `Employee` (
   KEY `Res` (`Res`),
   CONSTRAINT `Employee_ibfk_1` FOREIGN KEY (`Branch_id`) REFERENCES `Branch` (`Branch_id`),
   CONSTRAINT `Employee_ibfk_2` FOREIGN KEY (`Res`) REFERENCES `Branch` (`Res`),
-  CONSTRAINT `Employee_chk_1` CHECK (((substr(`Employee_id`,1,2) = _utf8mb3'WA') or (substr(`Employee_id`,1,2) = _utf8mb3'HC') or (substr(`Employee_id`,1,2) = _utf8mb3'SC') or (substr(`Employee_id`,1,2) = _utf8mb3'MA'))),
-  CONSTRAINT `Employee_chk_2` CHECK (((substr(`Super_id`,1,2) = _utf8mb3'WA') or (substr(`Super_id`,1,2) = _utf8mb3'HC') or (substr(`Super_id`,1,2) = _utf8mb3'SC') or (substr(`Super_id`,1,2) = _utf8mb3'MA')))
+  CONSTRAINT `Employee_chk_1` CHECK (((substr(`Employee_id`,1,2) = _utf8mb4'WA') or (substr(`Employee_id`,1,2) = _utf8mb4'HC') or (substr(`Employee_id`,1,2) = _utf8mb4'SC') or (substr(`Employee_id`,1,2) = _utf8mb4'MA'))),
+  CONSTRAINT `Employee_chk_3` CHECK ((substr(`Super_id`,1,2) = _utf8mb4'MA'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -303,7 +305,8 @@ DROP TABLE IF EXISTS `Waiter`;
 CREATE TABLE `Waiter` (
   `Waiter_id` varchar(20) NOT NULL,
   PRIMARY KEY (`Waiter_id`),
-  CONSTRAINT `Waiter_ibfk_1` FOREIGN KEY (`Waiter_id`) REFERENCES `Employee` (`Employee_id`)
+  CONSTRAINT `Waiter_ibfk_1` FOREIGN KEY (`Waiter_id`) REFERENCES `Employee` (`Employee_id`),
+  CONSTRAINT `Waiter_chk_1` CHECK ((substr(`Waiter_id`,1,2) = _utf8mb3'WA'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -326,4 +329,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-04 18:39:17
+-- Dump completed on 2020-10-04 20:35:47

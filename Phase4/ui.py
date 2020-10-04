@@ -1,41 +1,9 @@
 import subprocess as sp
 import pymysql
+import pymysql.err
 import pymysql.cursors
 import re
 from datetime import datetime
-
-"""
-Functions to check constraints
-"""
-def employeeIdConstraint(id):
-    try:
-        constraint = True
-        #add constraint for Employee_id
-        if not constraint:
-            print('\nIncorrect Employee ID format')
-            raise ValueError
-    except (AttributeError, TypeError):
-        print('\nID should be string')
-        raise AssertionError
-    return
-
-def phoneConstraint(phone):
-    try:
-        if not (len(phone)==10 or re.match('^[0-9]*$', phone)):
-            print('\nPhone numbers are 10 digits')
-            raise ValueError
-    except (AttributeError, TypeError):
-        print('\nPhone should be string')
-        raise AssertionError  
-    return
- 
-def timeConstraint(time):
-    try:
-        assert_time = datetime.strptime(time, '%y-%m-%d %H:%M:%S')
-    except ValueError:
-        print("\nTime is string YYYY-MM-DD HH:MM:SS")
-        raise ValueError
-    return
 
 """
 Functions for different options
@@ -50,21 +18,16 @@ def getFeedback(): # Finds specific record in Feedback
         entry['Phone'] = input("Phone: ").strip()
         entry['Time'] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
         
-        employeeIdConstraint(entry['Waiter'])  
-        employeeIdConstraint(entry['Chef'])
-        phoneConstraint(entry['Phone'])
-        timeConstraint(entry['Time'])
-        
-        query = "SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Time=%s"%(entry['Waiter'], entry['Chef'], entry['Dish'], entry['Phone'], entry['Time'])
-
-        print(query)
-        cur.execute(query)
+        cur.execute("SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Time=%s", (entry['Waiter'], entry['Chef'], entry['Dish'], entry['Phone'], entry['Time']))
         rows = cursor.fetchall()
         for row in rows:
             print(row)
         con.commit()
         print()
-
+    
+    except MySQLError as e:
+        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+    
     except Exception as e:
         con.rollback()
         print("Failed")
@@ -75,19 +38,17 @@ def getFeedback(): # Finds specific record in Feedback
 def employeeFeedback(): # Finds all records in Feedback for given employee 
     try:
         employee = input("Enter EmployeeID: ").strip()
-        
-        employeeIdConstraint(employee)  
 
-        query = "SELECT * FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s"%(employee, employee)
-       
-        print(query)
-        cur.execute(query)
+        cur.execute("SELECT * FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s", (employee, employee))        
         rows = cursor.fetchall()
         for row in rows:
             print(row)
         con.commit()
         print()
-
+    
+    except MySQLError as e:
+        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+    
     except Exception as e:
         con.rollback()
         print("Failed")
@@ -95,34 +56,26 @@ def employeeFeedback(): # Finds all records in Feedback for given employee
 
     return
 
-def avgRating(): # Finds all records in Feedback for given employee 
+def dishRating(): # Finds all ratings in Feedback for given dish 
     try:
-        employee = input("Enter EmployeeID: ").strip()
-        
-        employeeIdConstraint(employee)  
+        dish = input("Enter Dish name: ").strip()
 
-        query = "SELECT * FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s"%(employee, employee)
-       
-        print(query)
-        cur.execute(query)
+        cur.execute("SELECT Rating FROM Feedback WHERE Dish_name=%s", (dish,))        
         rows = cursor.fetchall()
         for row in rows:
             print(row)
         con.commit()
         print()
-
+    
+    except MySQLError as e:
+        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+    
     except Exception as e:
         con.rollback()
         print("Failed")
         print(">>>>>>>>>>>>>", e)
 
     return
-
-def option2():
-    """
-    Function to implement option 1
-    """
-    print("Not implemented")
 
 
 def option3():
@@ -137,6 +90,77 @@ def option4():
     Function to implement option 3
     """
     print("Not implemented")
+
+
+def dispatch(ch):
+    """
+    Function that maps helper functions to option entered
+    """
+    if(ch == 1):
+        getFeedback()
+    elif(ch == 2):
+        employeeFeedback()
+    elif(ch == 3):
+        dishRating()
+    elif(ch == 4):
+        option4()
+    else:
+        print("Error: Invalid Option")
+
+
+# Global
+while(1):
+    tmp = sp.call('clear', shell=True)
+    
+    # Can be skipped if you want to hard core username and password
+    username = input("Username: ")
+    password = input("Password: ")
+
+    try:
+        # Set db name accordingly which have been create by you
+        # Set host to the server's address if you don't want to use local SQL server 
+        con = pymysql.connect(host='localhost',
+                              user=username,
+                              password=password,
+                              db='Restaurant_Ratings',
+                              cursorclass=pymysql.cursors.DictCursor,
+                              port=5005)
+        tmp = sp.call('clear', shell=True)
+
+        if(con.open):
+            print("Connected")
+        else:
+            print("Failed to connect")
+
+        tmp = input("Enter any key to CONTINUE>")
+
+        with con.cursor() as cur:
+            while(1):
+                tmp = sp.call('clear', shell=True)
+                # Here taking example of Employee Mini-world
+                print("Enter a number to select corresponding option:-")
+                print("1 Get a specific Feedback")  
+                print("2 Get Feedback for an employee")
+                print("3 Get all Ratings for a dish")  
+                print("4 Option 4")  # Employee Statistics
+                print("5 Logout")
+                ch = int(input("Enter choice> "))
+                tmp = sp.call('clear', shell=True)
+                if ch == 5:
+                    break
+                else:
+                    dispatch(ch)
+                    tmp = input("Enter any key to CONTINUE>")
+
+    except:
+        tmp = sp.call('clear', shell=True)
+        print("Connection Refused: Either username or password is incorrect or user doesn't have access to database")
+        tmp = input("Enter any key to CONTINUE>")
+
+
+
+# ---------------------------------------------------------------------------------
+#redundant features kept for an unassumed requirement later (better safe than sorry :) )
 
 
 def hireAnEmployee():
@@ -181,67 +205,35 @@ def hireAnEmployee():
     return
 
 
-def dispatch(ch):
-    """
-    Function that maps helper functions to option entered
-    """
-
-    if(ch == 1):
-        hireAnEmployee()
-    elif(ch == 2):
-        option2()
-    elif(ch == 3):
-        option3()
-    elif(ch == 4):
-        option4()
-    else:
-        print("Error: Invalid Option")
-
-
-# Global
-while(1):
-    tmp = sp.call('clear', shell=True)
-    
-    # Can be skipped if you want to hard core username and password
-    username = input("Username: ")
-    password = input("Password: ")
-
+"""
+Functions to check constraints
+"""
+def employeeIdConstraint(id):
     try:
-        # Set db name accordingly which have been create by you
-        # Set host to the server's address if you don't want to use local SQL server 
-        con = pymysql.connect(host='localhost',
-                              user=username,
-                              password=password,
-                              db='COMPANY',
-                              cursorclass=pymysql.cursors.DictCursor,
-                              port=5005)
-        tmp = sp.call('clear', shell=True)
+        constraint = True
+        #add constraint for Employee_id
+        if not constraint:
+            print('\nIncorrect Employee ID format')
+            raise ValueError
+    except (AttributeError, TypeError):
+        print('\nID should be string')
+        raise AssertionError
+    return
 
-        if(con.open):
-            print("Connected")
-        else:
-            print("Failed to connect")
-
-        tmp = input("Enter any key to CONTINUE>")
-
-        with con.cursor() as cur:
-            while(1):
-                tmp = sp.call('clear', shell=True)
-                # Here taking example of Employee Mini-world
-                print("1. Option 1")  # Hire an Employee
-                print("2. Option 2")  # Fire an Employee
-                print("3. Option 3")  # Promote Employee
-                print("4. Option 4")  # Employee Statistics
-                print("5. Logout")
-                ch = int(input("Enter choice> "))
-                tmp = sp.call('clear', shell=True)
-                if ch == 5:
-                    break
-                else:
-                    dispatch(ch)
-                    tmp = input("Enter any key to CONTINUE>")
-
-    except:
-        tmp = sp.call('clear', shell=True)
-        print("Connection Refused: Either username or password is incorrect or user doesn't have access to database")
-        tmp = input("Enter any key to CONTINUE>")
+def phoneConstraint(phone):
+    try:
+        if not (len(phone)==10 or re.match('^[0-9]*$', phone)):
+            print('\nPhone numbers are 10 digits')
+            raise ValueError
+    except (AttributeError, TypeError):
+        print('\nPhone should be string')
+        raise AssertionError  
+    return
+ 
+def timeConstraint(time):
+    try:
+        assert_time = datetime.strptime(time, '%y-%m-%d %H:%M:%S')
+    except ValueError:
+        print("\nTime is string YYYY-MM-DD HH:MM:SS")
+        raise ValueError
+    return
