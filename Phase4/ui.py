@@ -11,7 +11,7 @@ Functions for different options
 def getFeedback(): # Finds specific record in Feedback 
     try:
         entry = {}
-        print("Enter the Feedback details: ")
+        print("Enter the Feedback details:- ")
         entry['Waiter'] = input("Waiter ID: ").strip()
         entry['Chef'] = input("Chef ID: ").strip()
         entry['Dish'] = input("Dish name: ").strip()
@@ -80,16 +80,22 @@ def dishRating(): # Finds all ratings in Feedback for given dish
 
     return
 
-def avgRating(): # Finds average rating for given Employee 
+def avgEmpRating(): # Finds average rating for given Employee 
     try:
         employee = input("Enter Employee ID: ").strip()
 
-        cur.execute("SELECT Rating FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s", (employee, employee))        
+        cur.execute("SELECT Avg(Rating) FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s", (employee, employee))        
         rows = cur.fetchall()
-        if len(rows):
-            print("The Average rating for Employee ", employee, " is " , str(sum(rows)/len(rows)))
+        print(rows)
+
+        # python implementation, to be ignored.
+        """
+        if len(rows)!=0:
+            print("The Average rating for Employee ", employee, " is " , str(sum(rows)//len(rows)))
         else:
             print("Employee not found")
+        """
+
         con.commit()
         print()
     
@@ -104,19 +110,48 @@ def avgRating(): # Finds average rating for given Employee
 
     return
 
-def option3():
-    """
-    Function to implement option 2
-    """
-    print("Not implemented")
+def avgBranchRating(): # Finds average rating for a Branch
+    try:
+        branch = input("Enter BranchID: ").strip()
+        try:
+            branch = int(branch)
+        except TypeError:
+            print("Please enter an integer BranchID")
+            raise
 
+        cur.execute("SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) HAVING Employee.Branch_id=%s", (branch, ))
+        rows = cur.fetchall()
+        print(rows)
 
-def option4():
-    """
-    Function to implement option 3
-    """
-    print("Not implemented")
+        #python implementation, to be ignored
+        """
+        rows=[]
+        for row in result:
+            if row['Branch']==branch:
+                rows.append(int(row['Rating']))
 
+        if len(rows)!=0:
+            print("The Average rating for Employee ", branch, " is " , str(sum(rows)//len(rows)))
+        else:
+            print("Branch Feedback not found")
+        """
+
+        con.commit()
+        print()
+    
+    except MySQLError as e:
+        con.rollback()
+        print('Encountered Database error {!r}, Error number- {}'.format(e, e.args[0]))
+    
+    except Exception as e:
+        con.rollback()
+        print("Failed")
+        print(">>>>>>>>>>>>>", e)
+
+    return
+
+# -------------------------------------------------------------------------------
+# End of Functionalities
 
 def dispatch(ch):
     """
@@ -129,7 +164,9 @@ def dispatch(ch):
     elif(ch == 3):
         dishRating()
     elif(ch == 4):
-        avgRating()
+        avgEmpRating()
+    elif(ch==5):
+        avgBranchRating()
     else:
         print("Error: Invalid Option")
 
@@ -165,14 +202,16 @@ while(1):
                 tmp = sp.call('clear', shell=True)
                 # Here taking example of Employee Mini-world
                 print("Enter a number to select corresponding option:-")
-                print("1 - Get a specific Feedback")  
-                print("2 - Get Feedback for an employee")
-                print("3 - Get all Ratings for a dish")  
-                print("4 - Get Average rating for an Employee")  
-                print("5 - Logout")
+                print("0 - Logout")
+                print("1 - Get a specific Feedback") #Select query
+                print("2 - Get Feedback for an employee") #Select query
+                print("3 - Get all Ratings for a dish") #Project query
+                print("4 - Get Average rating for an Employee") #Aggregate query
+                print("5 - Get Average rating for a Branch") #Analysis - Join and Aggregate
+
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
-                if ch == 5:
+                if ch == 0:
                     break
                 else:
                     dispatch(ch)
