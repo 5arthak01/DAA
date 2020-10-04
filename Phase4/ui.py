@@ -19,15 +19,16 @@ def getFeedback(): # Finds specific record in Feedback
         entry['Time'] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
         
         cur.execute("SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Time=%s", (entry['Waiter'], entry['Chef'], entry['Dish'], entry['Phone'], entry['Time']))
-        rows = cursor.fetchall()
+        rows = cur.fetchall()
         for row in rows:
             print(row)
         con.commit()
         print()
     
     except MySQLError as e:
-        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
-    
+        con.rollback()
+        print('Encountered Database error {!r}, Error number- {}'.format(e, e.args[0]))
+
     except Exception as e:
         con.rollback()
         print("Failed")
@@ -40,15 +41,16 @@ def employeeFeedback(): # Finds all records in Feedback for given employee
         employee = input("Enter EmployeeID: ").strip()
 
         cur.execute("SELECT * FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s", (employee, employee))        
-        rows = cursor.fetchall()
+        rows = cur.fetchall()
         for row in rows:
             print(row)
         con.commit()
         print()
     
     except MySQLError as e:
-        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
-    
+        con.rollback()
+        print('Encountered Database error {!r}, Error number- {}'.format(e, e.args[0]))
+
     except Exception as e:
         con.rollback()
         print("Failed")
@@ -61,14 +63,15 @@ def dishRating(): # Finds all ratings in Feedback for given dish
         dish = input("Enter Dish name: ").strip()
 
         cur.execute("SELECT Rating FROM Feedback WHERE Dish_name=%s", (dish,))        
-        rows = cursor.fetchall()
+        rows = cur.fetchall()
         for row in rows:
             print(row)
         con.commit()
         print()
     
     except MySQLError as e:
-        print('Got error {!r}, errno is {}'.format(e, e.args[0]))
+        con.rollback()
+        print('Encountered Database error {!r}, Error number- {}'.format(e, e.args[0]))
     
     except Exception as e:
         con.rollback()
@@ -158,21 +161,19 @@ while(1):
         tmp = input("Enter any key to CONTINUE>")
 
 
-
-# ---------------------------------------------------------------------------------
+"""
+---------------------------------------------------------------------------------
 #redundant features kept for an unassumed requirement later (better safe than sorry :) )
 
 
 def hireAnEmployee():
-    """
-    This is a sample function implemented for the refrence.
-    This example is related to the Employee Database.
-    In addition to taking input, you are required to handle domain errors as well
-    For example: the SSN should be only 9 characters long
-    Sex should be only M or F
-    If you choose to take Super_SSN, you need to make sure the foreign key constraint is satisfied
-    HINT: Instead of handling all these errors yourself, you can make use of except clause to print the error returned to you by MySQL
-    """
+    # This is a sample function implemented for the refrence.
+    # This example is related to the Employee Database.
+    # In addition to taking input, you are required to handle domain errors as well
+    # For example: the SSN should be only 9 characters long
+    # Sex should be only M or F
+    # If you choose to take Super_SSN, you need to make sure the foreign key constraint is satisfied
+    # HINT: Instead of handling all these errors yourself, you can make use of except clause to print the error returned to you by MySQL
     try:
         # Takes emplyee details as input
         row = {}
@@ -205,9 +206,7 @@ def hireAnEmployee():
     return
 
 
-"""
-Functions to check constraints
-"""
+# Functions to check constraints
 def employeeIdConstraint(id):
     try:
         constraint = True
@@ -237,3 +236,5 @@ def timeConstraint(time):
         print("\nTime is string YYYY-MM-DD HH:MM:SS")
         raise ValueError
     return
+
+"""
