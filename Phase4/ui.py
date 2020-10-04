@@ -80,6 +80,29 @@ def dishRating(): # Finds all ratings in Feedback for given dish
 
     return
 
+def avgRating(): # Finds average rating for given Employee 
+    try:
+        employee = input("Enter Employee ID: ").strip()
+
+        cur.execute("SELECT Rating FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s", (dish, dish))        
+        rows = cur.fetchall()
+        if len(rows):
+            print("The Average rating for Employee ", employee, " is " , str(sum(rows)/len(rows)))
+        else:
+            print("Employee not found")
+        con.commit()
+        print()
+    
+    except MySQLError as e:
+        con.rollback()
+        print('Encountered Database error {!r}, Error number- {}'.format(e, e.args[0]))
+    
+    except Exception as e:
+        con.rollback()
+        print("Failed")
+        print(">>>>>>>>>>>>>", e)
+
+    return
 
 def option3():
     """
@@ -106,7 +129,7 @@ def dispatch(ch):
     elif(ch == 3):
         dishRating()
     elif(ch == 4):
-        option4()
+        avgRating()
     else:
         print("Error: Invalid Option")
 
@@ -142,11 +165,11 @@ while(1):
                 tmp = sp.call('clear', shell=True)
                 # Here taking example of Employee Mini-world
                 print("Enter a number to select corresponding option:-")
-                print("1 Get a specific Feedback")  
-                print("2 Get Feedback for an employee")
-                print("3 Get all Ratings for a dish")  
-                print("4 Option 4")  # Employee Statistics
-                print("5 Logout")
+                print("1 - Get a specific Feedback")  
+                print("2 - Get Feedback for an employee")
+                print("3 - Get all Ratings for a dish")  
+                print("4 - Get Average rating for an Employee")  
+                print("5 - Logout")
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
                 if ch == 5:
