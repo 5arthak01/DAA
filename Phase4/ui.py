@@ -122,6 +122,10 @@ def avg_branch_rating():  # Finds average rating for a Branch
 
         con.commit()
         print()
+<<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
 
     except MySQLError as e:
         con.rollback()
@@ -178,6 +182,142 @@ def employees_less_than_x(): # Employees with average rating less than given num
 
 def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
     try:
+        choice = input("Enter \'Min\' or \'Max\' for Minimum or Maximum rating respectively: ").strip()
+        dish = input("Enter Dish name: ").strip()
+
+        if choice == "Max":
+            cur.execute("SELECT MAX(Rating) from Feedback where Dish_name=%s", (dish,))
+        elif choice == "Min":
+            cur.execute("SELECT MIN(Rating) from Feedback where Dish_name=%s", (dish,))
+        else:
+            print("Invalid Input")
+        
+=======
+
+>>>>>>> 2927cb6017e26146c70caaa7e923da5454da8b0e
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+<<<<<<< HEAD
+
+    return
+
+
+def employee_super(): # Finds the supervisor of an Employee
+    try:
+        emp = input("Employee ID: ").strip()
+        cur.execute("SELECT Super_id from Employee where Employee_id=%s", (emp,))
+=======
+
+    return
+
+
+def employee_super(): # Finds the supervisor of an Employee
+    try:
+        emp = input("Employee ID: ").strip()
+        cur.execute("SELECT Super_id from Employee where Employee_id=%s", (emp,))
+>>>>>>> upstream/master
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+<<<<<<< HEAD
+=======
+def employees_less_than_x(): # Employees with average rating less than given number 'x'
+    try:
+        x = input("Enter x: ").strip()
+        try:
+            x = int(x)
+        except TypeError:
+            print("Please enter a natural number")
+            raise
+
+        cur.execute(
+            "SELECT Employee.Employee_id,Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) group by Employee_id having Avg(Feedback.Rating)<%s",
+            (x,),
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+    
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
+    try:
+        choice = input("Enter \'Min\' or \'Max\' for Minimum or Maximum rating respectively: ").strip()
+        dish = input("Enter Dish name: ").strip()
+
+        if choice == "Max":
+            cur.execute("SELECT MAX(Rating) from Feedback where Dish_name=%s", (dish,))
+        elif choice == "Min":
+            cur.execute("SELECT MIN(Rating) from Feedback where Dish_name=%s", (dish,))
+        else:
+            print("Invalid Input")
+        
+>>>>>>> 2927cb6017e26146c70caaa7e923da5454da8b0e
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+<<<<<<< HEAD
+def employees_less_than_x(): # Employees with average rating less than given number 'x'
+    try:
+        x = input("Enter x: ").strip()
+        try:
+            x = int(x)
+        except TypeError:
+            print("Please enter a natural number")
+            raise
+
+        cur.execute(
+            "SELECT Employee.Employee_id,Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) group by Employee_id having Avg(Feedback.Rating)<%s",
+            (x,),
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+    
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
+    try:
         choice = input("Enter \'MIN\' or \'MAX\' for Minimum or Maximum rating respectively: ").strip()
         dish = input("Enter Dish name: ").strip()
 
@@ -200,6 +340,9 @@ def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
     return
 
 
+=======
+>>>>>>> upstream/master
+>>>>>>> 2927cb6017e26146c70caaa7e923da5454da8b0e
 def update_dish_price():  # Updates price of a dish
     try:
         dish = input("Enter Dish name: ").strip()
@@ -209,6 +352,7 @@ def update_dish_price():  # Updates price of a dish
         except TypeError:
             print("Please enter a natural number")
             raise
+<<<<<<< HEAD
 
         cur.execute("UPDATE Dish SET Price=%s WHERE Dish_name=%s", (price, dish))
         rows = cur.fetchall()
@@ -298,6 +442,10 @@ def insert_feedback(): # Add a Feedback
         rat = input("Enter Rating: ").strip()
 
         cur.execute("INSERT INTO Feedback (Waiter_id, Chef_id, Dish_name, Phone, Entry_time, Suggestion, Rating) VALUES (%s, %s, %s, %d, %s, %s, %d)", (wai, che, dis, pho, ent, sug, rat))
+=======
+
+        cur.execute("UPDATE Dish SET Price=%s WHERE Dish_name=%s", (price, dish))
+>>>>>>> 2927cb6017e26146c70caaa7e923da5454da8b0e
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -338,6 +486,7 @@ def dispatch(ch):
         employees_less_than_x()
     elif ch == 9:
         update_dish_price()
+<<<<<<< HEAD
     elif ch ==10:
         insert_employee()
     elif ch==11:
@@ -346,6 +495,8 @@ def dispatch(ch):
         insert_restaurant()
     elif ch==13:
         insert_feedback()
+=======
+>>>>>>> 2927cb6017e26146c70caaa7e923da5454da8b0e
     else:
         print("Error: Invalid Option")
 
@@ -393,11 +544,14 @@ while 1:
                 print("8 - Get Employees whose average rating is less than a given value X") # Analysis - Join and Agrregate
                 # Updates
                 print("9 - Update the price of a Dish")  # Update
+<<<<<<< HEAD
                 # Insertions
                 print("10 - Add an Employee") # Insertion
                 print("11 - Add a Branch") # Insertion
                 print("12 - Add a Restaurant") # Insertion
                 print("13 - Add a Feedback") # Insertion
+=======
+>>>>>>> 2927cb6017e26146c70caaa7e923da5454da8b0e
                 
                 try:
                     ch = int(input("Enter choice> ").strip())
@@ -415,4 +569,12 @@ while 1:
     except:
         tmp = sp.call("clear", shell=True)
         print("Connection Refused: Either username or password is incorrect or user doesn't have access to database")
+<<<<<<< HEAD
         tmp = input("Enter any key to CONTINUE>")
+=======
+<<<<<<< HEAD
+        tmp = input("Enter any key to CONTINUE>")
+=======
+        tmp = input("Enter any key to CONTINUE>")
+>>>>>>> upstream/master
+>>>>>>> 2927cb6017e26146c70caaa7e923da5454da8b0e
