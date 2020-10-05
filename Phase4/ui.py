@@ -225,6 +225,39 @@ def update_dish_price():  # Updates price of a dish
     return
 
 
+def search_suggestion():
+    try:
+        search = input("Enter what you are searching for: ").strip()
+        query = """SELECT Suggestion FROM Feedback WHERE Suggestion LIKE %s"""
+        cur.execute(query, ("%" + search + "%",))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        print("Got error {!r}, errno is {}".format(e, e.args[0]))
+
+    return
+
+
+def get_subordinate():
+    try:
+        manager = input("Enter the Manager ID: ").strip()
+        cur.execute("SELECT Employee_id FROM Employee where Super_id = %s", (manager,))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MYSQLError as e:
+        print("Got error {!r}, errno is {}".format(e, e.args[0]))
+
+    return
+
+
 # -------------------------------------------------------------------------------
 # End of Functionalities
 
@@ -296,6 +329,8 @@ while 1:
                 print("6 - Get the Maximum or Minimum rating of a particular dish") # Analysis - Join and Agrregate
                 print("7 - Get the Supervisor of a Particular Employee") # Select
                 print("8 - Get Employees whose average rating is less than a given value X") # Analysis - Join and Agrregate
+                print("  Search using a partial match in suggestion") # Search
+                print(" Get all subordinates of a Particular Manager") # Select
                 # Updates
                 print("9 - Update the price of a Dish")  # Update
                 
