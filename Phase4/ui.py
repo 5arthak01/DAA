@@ -178,13 +178,11 @@ def employees_less_than_x(): # Employees with average rating less than given num
 
 def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
     try:
-        choice = input("Enter \'Min\' or \'Max\' for Minimum or Maximum rating respectively: ").strip()
+        choice = input("Enter \'MIN\' or \'MAX\' for Minimum or Maximum rating respectively: ").strip()
         dish = input("Enter Dish name: ").strip()
 
-        if choice == "Max":
-            cur.execute("SELECT MAX(Rating) from Feedback where Dish_name=%s", (dish,))
-        elif choice == "Min":
-            cur.execute("SELECT MIN(Rating) from Feedback where Dish_name=%s", (dish,))
+        if choice == "MAX" or choice == "MIN":
+            cur.execute(f"SELECT {choice}(Rating) from Feedback where Dish_name=%s", (dish,))
         else:
             print("Invalid Input")
         
