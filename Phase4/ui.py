@@ -16,7 +16,7 @@ def get_feedback():  # Finds specific record in Feedback
         entry["Chef"] = input("Chef ID: ").strip()
         entry["Dish"] = input("Dish name: ").strip()
         entry["Phone"] = input("Phone: ").strip()
-        entry["Time"] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
+        entry["Entry_time"] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
 
         cur.execute(
             "SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Time=%s",(
@@ -24,7 +24,7 @@ def get_feedback():  # Finds specific record in Feedback
                 entry["Chef"],
                 entry["Dish"],
                 entry["Phone"],
-                entry["Time"],
+                entry["Entry_time"],
             )
         )
         rows = cur.fetchall()
@@ -93,14 +93,6 @@ def avg_emp_rating():  # Finds average rating for given Employee
         rows = cur.fetchall()
         print(rows)
 
-        # python implementation, to be ignored.
-        """
-        if len(rows)!=0:
-            print("The Average rating for Employee ", employee, " is " , str(sum(rows)//len(rows)))
-        else:
-            print("Employee not found")
-        """
-
         con.commit()
         print()
 
@@ -122,24 +114,11 @@ def avg_branch_rating():  # Finds average rating for a Branch
             raise
 
         cur.execute(
-            "SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) HAVING Employee.Branch_id=%s",
+            "SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) WHERE Employee.Branch_id=%s",
             (branch,)
         )
         rows = cur.fetchall()
         print(rows)
-
-        # python implementation, to be ignored
-        """
-        rows=[]
-        for row in result:
-            if row['Branch']==branch:
-                rows.append(int(row['Rating']))
-
-        if len(rows)!=0:
-            print("The Average rating for Employee ", branch, " is " , str(sum(rows)//len(rows)))
-        else:
-            print("Branch Feedback not found")
-        """
 
         con.commit()
         print()
@@ -152,12 +131,88 @@ def avg_branch_rating():  # Finds average rating for a Branch
     return
 
 
-def dish_price():  # Updates price of a dish
+def employee_super(): # Finds the supervisor of an Employee
+    try:
+        emp = input("Employee ID: ").strip()
+        cur.execute("SELECT Super_id from Employee where Employee_id=%s", (emp,))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def employees_less_than_x(): # Employees with average rating less than given number 'x'
+    try:
+        x = input("Enter x: ").strip()
+        try:
+            x = int(x)
+        except TypeError:
+            print("Please enter a natural number")
+            raise
+
+        cur.execute(
+            "SELECT Employee.Employee_id,Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) group by Employee_id having Avg(Feedback.Rating)<%s",
+            (x,),
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+    
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
+    try:
+        choice = input("Enter \'Min\' or \'Max\' for Minimum or Maximum rating respectively: ").strip()
+        dish = input("Enter Dish name: ").strip()
+
+        if choice == "Max":
+            cur.execute("SELECT MAX(Rating) from Feedback where Dish_name=%s", (dish,))
+        elif choice == "Min":
+            cur.execute("SELECT MIN(Rating) from Feedback where Dish_name=%s", (dish,))
+        else:
+            print("Invalid Input")
+        
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def update_dish_price():  # Updates price of a dish
     try:
         dish = input("Enter Dish name: ").strip()
         price = input("Enter New price: ").strip()
+        try:
+            price = int(price)
+        except TypeError:
+            print("Please enter a natural number")
+            raise
 
-        cur.execute("UPDATE Dish SET Price=%d WHERE Dish_name=%s", (price, dish))
+        cur.execute("UPDATE Dish SET Price=%s WHERE Dish_name=%s", (price, dish))
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -191,7 +246,13 @@ def dispatch(ch):
     elif ch == 5:
         avg_branch_rating()
     elif ch == 6:
-        dish_price()
+        max_min_dish_rating()
+    elif ch == 7:
+        employee_super() 
+    elif ch == 8:
+        employees_less_than_x()
+    elif ch == 9:
+        update_dish_price()
     else:
         print("Error: Invalid Option")
 
@@ -227,18 +288,21 @@ while 1:
                 tmp = sp.call("clear", shell=True)
 
                 print("Enter a number to select corresponding option:-")
-                # Queries
                 print("0 - Logout")
-                print("1 - Get a specific Feedback")  # Select query
-                print("2 - Get Feedback for an employee")  # Select query
-                print("3 - Get all Ratings for a dish")  # Project query
-                print("4 - Get Average rating for an Employee")  # Aggregate query
+                # Queries
+                print("1 - Get a specific Feedback")  # Select 
+                print("2 - Get Feedback for an employee")  # Select 
+                print("3 - Get all Ratings for a dish")  # Project 
+                print("4 - Get Average rating for an Employee")  # Aggregate 
                 print("5 - Get Average rating for a Branch")  # Analysis - Join and Aggregate
+                print("6 - Get the Maximum or Minimum rating of a particular dish") # Analysis - Join and Agrregate
+                print("7 - Get the Supervisor of a Particular Employee") # Select
+                print("8 - Get Employees whose average rating is less than a given value X") # Analysis - Join and Agrregate
                 # Updates
-                print("6 - Update the price of a Dish")  # Update
-
+                print("9 - Update the price of a Dish")  # Update
+                
                 try:
-                    ch = int(input("Enter choice> "))
+                    ch = int(input("Enter choice> ").strip())
                 except TypeError:
                     print("\nPlease enter an integer\n")
                     raise
@@ -254,80 +318,3 @@ while 1:
         tmp = sp.call("clear", shell=True)
         print("Connection Refused: Either username or password is incorrect or user doesn't have access to database")
         tmp = input("Enter any key to CONTINUE>")
-
-
-# ---------------------------------------------------------------------------------
-# redundant features kept for an unassumed requirement later (better safe than sorry :) )
-"""
-def hireAnEmployee():
-    # This is a sample function implemented for the refrence.
-    # This example is related to the Employee Database.
-    # In addition to taking input, you are required to handle domain errors as well
-    # For example: the SSN should be only 9 characters long
-    # Sex should be only M or F
-    # If you choose to take Super_SSN, you need to make sure the foreign key constraint is satisfied
-    # HINT: Instead of handling all these errors yourself, you can make use of except clause to print the error returned to you by MySQL
-    try:
-        # Takes emplyee details as input
-        row = {}
-        print("Enter new employee's details: ")
-        name = (input("Name (Fname Minit Lname): ")).split(' ')
-        row["Fname"] = name[0]
-        row["Minit"] = name[1]
-        row["Lname"] = name[2]
-        row["Ssn"] = input("SSN: ")
-        row["Bdate"] = input("Birth Date (YYYY-MM-DD): ")
-        row["Address"] = input("Address: ")
-        row["Sex"] = input("Sex: ")
-        row["Salary"] = float(input("Salary: "))
-        row["Dno"] = int(input("Dno: "))
-
-        query = "INSERT INTO EMPLOYEE(Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Dno) VALUES('%s', '%c', '%s', '%s', '%s', '%s', '%c', %f, %d)" % (
-            row["Fname"], row["Minit"], row["Lname"], row["Ssn"], row["Bdate"], row["Address"], row["Sex"], row["Salary"], row["Dno"])
-
-        print(query)
-        cur.execute(query)
-        con.commit()
-
-        print("Inserted Into Database")
-
-    except Exception as e:
-        con.rollback()
-        print("Failed to insert into database")
-        print(">>>>>>>>>>>>>", e)
-
-    return
-
-
-# Functions to check constraints
-def employeeIdConstraint(id):
-    try:
-        constraint = True
-        #add constraint for Employee_id
-        if not constraint:
-            print('\nIncorrect Employee ID format')
-            raise ValueError
-    except (AttributeError, TypeError):
-        print('\nID should be string')
-        raise AssertionError
-    return
-
-def phoneConstraint(phone):
-    try:
-        if not (len(phone)==10 or re.match('^[0-9]*$', phone)):
-            print('\nPhone numbers are 10 digits')
-            raise ValueError
-    except (AttributeError, TypeError):
-        print('\nPhone should be string')
-        raise AssertionError  
-    return
- 
-def timeConstraint(time):
-    try:
-        assert_time = datetime.strptime(time, '%y-%m-%d %H:%M:%S')
-    except ValueError:
-        print("\nTime is string YYYY-MM-DD HH:MM:SS")
-        raise ValueError
-    return
-
-"""
