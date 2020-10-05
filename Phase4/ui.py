@@ -258,6 +258,106 @@ def get_subordinate():
     return
 
 
+def insert_employee():  # Add an Employee
+    try:
+        employee = input("Enter New Employee ID: ").strip()
+        branch = input("Enter Branch ID: ").strip()
+        supervisor = input("Enter Supervisor ID: ").strip()
+        restaurant = input("Enter Restaurant Number: ").strip()
+
+        cur.execute(
+            "INSERT INTO Employee (Employee_id, Branch_id, Super_id, Res) VALUES (%s, %s, %s, %s)",
+            (employee, branch, supervisor, restaurant)
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def insert_branch():  # Add a Branch
+    try:
+        restaurant = input("Enter Restaurant Number: ").strip()
+        branch = input("Enter New Branch ID: ").strip()
+
+        cur.execute(
+            "INSERT INTO Branch (Res, Branch_id) VALUES (%s, %s)", (restaurant, branch)
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def insert_restaurant():  # Add a Restaurant
+    try:
+        restaurant = input("Enter New Restaurant Name: ").strip()
+        cin = input("Enter New Restaurant Number: ").strip()
+
+        cur.execute(
+            "INSERT INTO Restaurant (cin_num, name) VALUES (%s, %s)", (cin, restaurant)
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def insert_feedback():  # Add a Feedback
+    try:
+        waiter = input("Enter Waiter ID: ").strip()
+        chef = input("Enter Chef ID: ").strip()
+        dish = input("Enter Dish Name: ").strip()
+        phone = input("Enter Phone Number: ").strip()
+        entry = input("Enter Entry Time as YYYY-MM-DD HH:MM:SS: ").strip()
+        suggestion = input("Enter Suggestion: ").strip()
+        rating = input("Enter Rating: ").strip()
+
+        cur.execute(
+            "INSERT INTO Customers (Phone, Entry_time) VALUES (%s, %s)", (phone, entry)
+        )
+        cur.execute(
+            "INSERT INTO Feedback (Waiter_id, Chef_id, Dish_name, Phone, Entry_time, Suggestion, Rating) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (waiter, chef, dish, phone, entry, suggestion, rating)
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
 # -------------------------------------------------------------------------------
 # End of Functionalities
 
@@ -283,7 +383,19 @@ def dispatch(ch):
     elif ch == 8:
         employees_less_than_x()
     elif ch == 9:
+        search_suggestion()
+    elif ch == 10:
+        get_subordinate()
+    elif ch == 21:
         update_dish_price()
+    elif ch == 22:
+        insert_employee()
+    elif ch == 23:
+        insert_branch()
+    elif ch == 24:
+        insert_restaurant()
+    elif ch == 25:
+        insert_feedback()
     else:
         print("Error: Invalid Option")
 
@@ -329,10 +441,14 @@ while 1:
                 print("6 - Get the Maximum or Minimum rating of a particular dish") # Analysis - Join and Agrregate
                 print("7 - Get the Supervisor of a Particular Employee") # Select
                 print("8 - Get Employees whose average rating is less than a given value X") # Analysis - Join and Agrregate
-                print("  Search using a partial match in suggestion") # Search
-                print(" Get all subordinates of a Particular Manager") # Select
+                print("9 - Search using a partial match in suggestion") # Search
+                print("10 - Get all subordinates of a Particular Manager") # Select
                 # Updates
-                print("9 - Update the price of a Dish")  # Update
+                print("21 - Update the price of a Dish")  # Update
+                print("22 - Add an Employee")  # Insertion
+                print("23 - Add a Branch")  # Insertion
+                print("24 - Add a Restaurant")  # Insertion
+                print("25 - Add a Feedback")  # Insertion
                 
                 try:
                     ch = int(input("Enter choice> ").strip())
