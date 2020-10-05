@@ -19,14 +19,13 @@ def get_feedback():  # Finds specific record in Feedback
         entry["Time"] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
 
         cur.execute(
-            "SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Time=%s",
-            (
+            "SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Time=%s",(
                 entry["Waiter"],
                 entry["Chef"],
                 entry["Dish"],
                 entry["Phone"],
                 entry["Time"],
-            ),
+            )
         )
         rows = cur.fetchall()
         for row in rows:
@@ -48,7 +47,7 @@ def employee_feedback():  # Finds all records in Feedback for given employee
 
         cur.execute(
             "SELECT * FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s",
-            (employee, employee),
+            (employee, employee)
         )
         rows = cur.fetchall()
         for row in rows:
@@ -89,7 +88,7 @@ def avg_emp_rating():  # Finds average rating for given Employee
 
         cur.execute(
             "SELECT Avg(Rating) FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s",
-            (employee, employee),
+            (employee, employee)
         )
         rows = cur.fetchall()
         print(rows)
@@ -124,7 +123,7 @@ def avg_branch_rating():  # Finds average rating for a Branch
 
         cur.execute(
             "SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) HAVING Employee.Branch_id=%s",
-            (branch,),
+            (branch,)
         )
         rows = cur.fetchall()
         print(rows)
@@ -158,7 +157,7 @@ def dish_price():  # Updates price of a dish
         dish = input("Enter Dish name: ").strip()
         price = input("Enter New price: ").strip()
 
-        cur.execute("UPDATE Dish SET Price=%d WHERE Dish_name=%s"(price, dish))
+        cur.execute("UPDATE Dish SET Price=%d WHERE Dish_name=%s", (price, dish))
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -206,15 +205,13 @@ while 1:
     password = input("Password: ")
 
     try:
-        # Set db name accordingly which have been create by you
-        # Set host to the server's address if you don't want to use local SQL server
         con = pymysql.connect(
-            host="localhost",
+            host="localhost", # OR set appropriate host
             user=username,
             password=password,
-            db="Restaurant_Ratings",
+            db="Restaurant_Ratings", # Name of our Database 
             cursorclass=pymysql.cursors.DictCursor,
-            port=5005,
+            port=5005 # Since our docker container hosts mysql server at this port
         )
         tmp = sp.call("clear", shell=True)
 
@@ -236,9 +233,7 @@ while 1:
                 print("2 - Get Feedback for an employee")  # Select query
                 print("3 - Get all Ratings for a dish")  # Project query
                 print("4 - Get Average rating for an Employee")  # Aggregate query
-                print(
-                    "5 - Get Average rating for a Branch"
-                )  # Analysis - Join and Aggregate
+                print("5 - Get Average rating for a Branch")  # Analysis - Join and Aggregate
                 # Updates
                 print("6 - Update the price of a Dish")  # Update
 
@@ -257,9 +252,7 @@ while 1:
 
     except:
         tmp = sp.call("clear", shell=True)
-        print(
-            "Connection Refused: Either username or password is incorrect or user doesn't have access to database"
-        )
+        print("Connection Refused: Either username or password is incorrect or user doesn't have access to database")
         tmp = input("Enter any key to CONTINUE>")
 
 
