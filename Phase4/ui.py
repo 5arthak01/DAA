@@ -520,10 +520,10 @@ while 1:
                 )  # Analysis - Join and Aggregate
                 # Updates
                 print("9 - Update the price of a Dish")  # Update
-                print("10 - Add an Employee")  # Insertion
-                print("11 - Add a Branch")  # Insertion
-                print("12 - Add a Restaurant")  # Insertion
-                print("13 - Add a Feedback")  # Insertion
+                print("Add an Employee")  # Insertion
+                print("Add a Branch")  # Insertion
+                print("Add a Restaurant")  # Insertion
+                print("Add a Feedback")  # Insertion
 
                 try:
                     ch = int(input("Enter choice> ").strip())
