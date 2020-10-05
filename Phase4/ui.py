@@ -244,7 +244,7 @@ def search_suggestion():
 
 def get_subordinate():
     try:
-        manager = input("Enter the Manager iD: ").strip()
+        manager = input("Enter the Manager ID: ").strip()
         cur.execute("SELECT Employee_id FROM Employee where Super_id = %s", (manager,))
         rows = cur.fetchall()
         for row in rows:
@@ -329,8 +329,8 @@ while 1:
                 print("6 - Get the Maximum or Minimum rating of a particular dish") # Analysis - Join and Agrregate
                 print("7 - Get the Supervisor of a Particular Employee") # Select
                 print("8 - Get Employees whose average rating is less than a given value X") # Analysis - Join and Agrregate
-                print("  Search using a partial match in suggestion")
-                print(" Get all subordinates of a Particular Manager")
+                print("  Search using a partial match in suggestion") # Search
+                print(" Get all subordinates of a Particular Manager") # Select
                 # Updates
                 print("9 - Update the price of a Dish")  # Update
                 
