@@ -122,6 +122,7 @@ def avg_branch_rating():  # Finds average rating for a Branch
 
         con.commit()
         print()
+<<<<<<< HEAD
 
     except MySQLError as e:
         con.rollback()
@@ -188,6 +189,21 @@ def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
         else:
             print("Invalid Input")
         
+=======
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def employee_super(): # Finds the supervisor of an Employee
+    try:
+        emp = input("Employee ID: ").strip()
+        cur.execute("SELECT Super_id from Employee where Employee_id=%s", (emp,))
+>>>>>>> upstream/master
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -202,6 +218,62 @@ def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
     return
 
 
+<<<<<<< HEAD
+=======
+def employees_less_than_x(): # Employees with average rating less than given number 'x'
+    try:
+        x = input("Enter x: ").strip()
+        try:
+            x = int(x)
+        except TypeError:
+            print("Please enter a natural number")
+            raise
+
+        cur.execute(
+            "SELECT Employee.Employee_id,Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) group by Employee_id having Avg(Feedback.Rating)<%s",
+            (x,),
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+    
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
+    try:
+        choice = input("Enter \'Min\' or \'Max\' for Minimum or Maximum rating respectively: ").strip()
+        dish = input("Enter Dish name: ").strip()
+
+        if choice == "Max":
+            cur.execute("SELECT MAX(Rating) from Feedback where Dish_name=%s", (dish,))
+        elif choice == "Min":
+            cur.execute("SELECT MIN(Rating) from Feedback where Dish_name=%s", (dish,))
+        else:
+            print("Invalid Input")
+        
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+
+>>>>>>> upstream/master
 def update_dish_price():  # Updates price of a dish
     try:
         dish = input("Enter Dish name: ").strip()
@@ -317,4 +389,8 @@ while 1:
     except:
         tmp = sp.call("clear", shell=True)
         print("Connection Refused: Either username or password is incorrect or user doesn't have access to database")
+<<<<<<< HEAD
         tmp = input("Enter any key to CONTINUE>")
+=======
+        tmp = input("Enter any key to CONTINUE>")
+>>>>>>> upstream/master
