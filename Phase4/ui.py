@@ -176,6 +176,26 @@ def employee_super():
     return
 
 
+def employees_less_than_x():
+    try:
+        x = input("Enter x: ").strip()
+        cur.execute(
+            "SELECT Employee.Employee_id,Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) group by Employee_id having Avg(Feedback.Rating)<%s",
+            (x,),
+        )
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+    
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
 # -------------------------------------------------------------------------------
 # End of Functionalities
 
@@ -242,6 +262,7 @@ while 1:
                 print("5 - Get Average rating for a Branch")  # Analysis - Join and Aggregate
                 # Updates
                 print("6 - Update the price of a Dish")  # Update
+                print("7 - Get the Supervisor of a Particular Employee")
 
                 try:
                     ch = int(input("Enter choice> "))
