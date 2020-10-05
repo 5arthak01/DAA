@@ -150,6 +150,28 @@ def avgBranchRating(): # Finds average rating for a Branch
 
     return
 
+def dishPrice(): #Updates price of a dish
+    try:
+        dish=input("Enter Dish name: ").strip()
+        price=input("Enter New price: ").strip()
+
+        cur.execute("UPDATE Dish SET Price=%d WHERE Dish_name=%s"(price,dish))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print('Encountered Database error {!r}, Error number- {}'.format(e, e.args[0]))
+    except Exception as e:
+        con.rollback()
+        print("Failed")
+        print(">>>>>>>>>>>>>", e)
+
+    return
+
 # -------------------------------------------------------------------------------
 # End of Functionalities
 
@@ -165,8 +187,10 @@ def dispatch(ch):
         dishRating()
     elif(ch == 4):
         avgEmpRating()
-    elif(ch==5):
+    elif(ch == 5):
         avgBranchRating()
+    elif(ch == 6):
+        dishPrice()
     else:
         print("Error: Invalid Option")
 
@@ -208,6 +232,7 @@ while(1):
                 print("3 - Get all Ratings for a dish") #Project query
                 print("4 - Get Average rating for an Employee") #Aggregate query
                 print("5 - Get Average rating for a Branch") #Analysis - Join and Aggregate
+                print("6 - Update the price of a Dish") #Update
 
                 ch = int(input("Enter choice> "))
                 tmp = sp.call('clear', shell=True)
