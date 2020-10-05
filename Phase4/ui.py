@@ -16,7 +16,7 @@ def get_feedback():  # Finds specific record in Feedback
         entry["Chef"] = input("Chef ID: ").strip()
         entry["Dish"] = input("Dish name: ").strip()
         entry["Phone"] = input("Phone: ").strip()
-        entry["Time"] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
+        entry["Entry_time"] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
 
         cur.execute(
             "SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Time=%s",(
@@ -24,7 +24,7 @@ def get_feedback():  # Finds specific record in Feedback
                 entry["Chef"],
                 entry["Dish"],
                 entry["Phone"],
-                entry["Time"],
+                entry["Entry_time"],
             )
         )
         rows = cur.fetchall()
@@ -122,24 +122,11 @@ def avg_branch_rating():  # Finds average rating for a Branch
             raise
 
         cur.execute(
-            "SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) HAVING Employee.Branch_id=%s",
+            "SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) WHERE Employee.Branch_id=%s",
             (branch,)
         )
         rows = cur.fetchall()
         print(rows)
-
-        # python implementation, to be ignored
-        """
-        rows=[]
-        for row in result:
-            if row['Branch']==branch:
-                rows.append(int(row['Rating']))
-
-        if len(rows)!=0:
-            print("The Average rating for Employee ", branch, " is " , str(sum(rows)//len(rows)))
-        else:
-            print("Branch Feedback not found")
-        """
 
         con.commit()
         print()
@@ -157,7 +144,24 @@ def dish_price():  # Updates price of a dish
         dish = input("Enter Dish name: ").strip()
         price = input("Enter New price: ").strip()
 
-        cur.execute("UPDATE Dish SET Price=%d WHERE Dish_name=%s", (price, dish))
+        cur.execute("UPDATE Dish SET Price=%s WHERE Dish_name=%s", (price, dish))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+
+    return
+
+def employee_super():
+    try:
+        emp = input("Employee ID: ").strip()
+        cur.execute("SELECT Super_id from Employee where Employee_id=%s", (emp,))
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -192,6 +196,8 @@ def dispatch(ch):
         avg_branch_rating()
     elif ch == 6:
         dish_price()
+    elif ch == 7:
+        employee_super() 
     else:
         print("Error: Invalid Option")
 
