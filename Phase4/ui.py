@@ -19,13 +19,14 @@ def get_feedback():  # Finds specific record in Feedback
         entry["Entry_time"] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
 
         cur.execute(
-            "SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Time=%s",(
+            "SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Entry_time=%s",
+            (
                 entry["Waiter"],
                 entry["Chef"],
                 entry["Dish"],
                 entry["Phone"],
                 entry["Entry_time"],
-            )
+            ),
         )
         rows = cur.fetchall()
         for row in rows:
@@ -47,7 +48,7 @@ def employee_feedback():  # Finds all records in Feedback for given employee
 
         cur.execute(
             "SELECT * FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s",
-            (employee, employee)
+            (employee, employee),
         )
         rows = cur.fetchall()
         for row in rows:
@@ -88,7 +89,7 @@ def avg_emp_rating():  # Finds average rating for given Employee
 
         cur.execute(
             "SELECT Avg(Rating) FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s",
-            (employee, employee)
+            (employee, employee),
         )
         rows = cur.fetchall()
         print(rows)
@@ -104,36 +105,9 @@ def avg_emp_rating():  # Finds average rating for given Employee
     return
 
 
-def avg_branch_rating():  # Finds average rating for a Branch
+def employee_super():  # Finds the supervisor of an Employee
     try:
-        branch = input("Enter BranchID: ").strip()
-        try:
-            branch = int(branch)
-        except TypeError:
-            print("Please enter an integer BranchID")
-            raise
-
-        cur.execute(
-            "SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) WHERE Employee.Branch_id=%s",
-            (branch,)
-        )
-        rows = cur.fetchall()
-        print(rows)
-
-        con.commit()
-        print()
-
-    except MySQLError as e:
-        con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
-
-    return
-
-
-def employee_super(): # Finds the supervisor of an Employee
-    try:
-        emp = input("Employee ID: ").strip()
+        emp = input("Enter Employee ID: ").strip()
         cur.execute("SELECT Super_id from Employee where Employee_id=%s", (emp,))
         rows = cur.fetchall()
         for row in rows:
@@ -149,7 +123,7 @@ def employee_super(): # Finds the supervisor of an Employee
     return
 
 
-def employees_less_than_x(): # Employees with average rating less than given number 'x'
+def employees_less_than_x():  # Employees with average rating less than given number 'x'
     try:
         x = input("Enter x: ").strip()
         try:
@@ -167,7 +141,7 @@ def employees_less_than_x(): # Employees with average rating less than given num
             print(row)
         con.commit()
         print()
-    
+
     except MySQLError as e:
         con.rollback()
         print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
@@ -176,16 +150,21 @@ def employees_less_than_x(): # Employees with average rating less than given num
     return
 
 
-def max_min_dish_rating(): # Finds minimum or maximum rating for given Dish
+def max_min_dish_rating():  # Finds minimum or maximum rating for given Dish
     try:
-        choice = input("Enter \'MIN\' or \'MAX\' for Minimum or Maximum rating respectively: ").strip()
+        choice = input(
+            "Enter 'MIN' or 'MAX' for Minimum or Maximum rating respectively: "
+        ).strip()
         dish = input("Enter Dish name: ").strip()
 
         if choice == "MAX" or choice == "MIN":
-            cur.execute(f"SELECT {choice}(Rating) from Feedback where Dish_name=%s", (dish,))
+            cur.execute(
+                f"SELECT {choice}(Rating) from Feedback where Dish_name=%s", (dish,)
+            )
         else:
             print("Invalid Input")
-        
+            return
+
         rows = cur.fetchall()
         for row in rows:
             print(row)
@@ -267,7 +246,7 @@ def insert_employee():  # Add an Employee
 
         cur.execute(
             "INSERT INTO Employee (Employee_id, Branch_id, Super_id, Res) VALUES (%s, %s, %s, %s)",
-            (employee, branch, supervisor, restaurant)
+            (employee, branch, supervisor, restaurant),
         )
         rows = cur.fetchall()
         for row in rows:
@@ -342,7 +321,7 @@ def insert_feedback():  # Add a Feedback
         )
         cur.execute(
             "INSERT INTO Feedback (Waiter_id, Chef_id, Dish_name, Phone, Entry_time, Suggestion, Rating) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-            (waiter, chef, dish, phone, entry, suggestion, rating)
+            (waiter, chef, dish, phone, entry, suggestion, rating),
         )
         rows = cur.fetchall()
         for row in rows:
@@ -355,6 +334,70 @@ def insert_feedback():  # Add a Feedback
         print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
         print("-" * 10)
 
+    return
+
+
+def avg_dish_and_customer_ratings():
+    try:
+        print("Enter a number to select corresponding option:-")
+        print("1 - Get the average Rating of a Dish")
+        print("2 - Get the average Rating given by a Customer")
+        choice = input().strip()
+        if choice == "1":
+            choice = "Dish_name"
+            inp = input("Enter the Dish name: ").strip()
+        elif choice == "2":
+            choice = "Phone"
+            inp = input("Enter the Phone number of the Customer: ").strip()
+        else:
+            print("Invalid Input")
+            return
+
+        cur.execute(f"SELECT AVG(Rating) FROM Feedback WHERE {choice}=%s", (inp,))
+        rows = cur.fetchall()
+        print(rows)
+
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+    return
+
+
+def avg_rating_branch_and_restaurant():  # Finds average rating for a Branch
+    try:
+
+        print("Enter a number to select corresponding option:-")
+        print("1 - Get the average Rating of a Restaurant")
+        print("2 - Get the average Rating of a Branch")
+        choice = input().strip()
+        if choice == "1":
+            choice = "Res"
+            inp = input("Enter the Restaurant Cin_num: ").strip()
+        elif choice == "2":
+            choice = "Branch_id"
+            inp = input("Enter the Branch_Id: ").strip()
+        else:
+            print("Invalid Input")
+            return
+
+        cur.execute(
+            f"SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) WHERE Employee.{choice}=%s",
+            (inp,),
+        )
+        rows = cur.fetchall()
+        print(rows)
+
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
     return
 
 
@@ -375,17 +418,19 @@ def dispatch(ch):
     elif ch == 4:
         avg_emp_rating()
     elif ch == 5:
-        avg_branch_rating()
+        avg_rating_branch_and_restaurant()
     elif ch == 6:
         max_min_dish_rating()
     elif ch == 7:
-        employee_super() 
+        employee_super()
     elif ch == 8:
         employees_less_than_x()
     elif ch == 9:
         search_suggestion()
     elif ch == 10:
         get_subordinate()
+    elif ch == 11:
+        avg_dish_and_customer_ratings()
     elif ch == 21:
         update_dish_price()
     elif ch == 22:
@@ -410,12 +455,12 @@ while 1:
 
     try:
         con = pymysql.connect(
-            host="localhost", # OR set appropriate host
+            host="localhost",  # OR set appropriate host
             user=username,
             password=password,
-            db="Restaurant_Ratings", # Name of our Database 
+            db="Restaurant_Ratings",  # Name of our Database
             cursorclass=pymysql.cursors.DictCursor,
-            port=5005 # Since our docker container hosts mysql server at this port
+            port=5005,  # Since our docker container hosts mysql server at this port
         )
         tmp = sp.call("clear", shell=True)
 
@@ -433,23 +478,32 @@ while 1:
                 print("Enter a number to select corresponding option:-")
                 print("0 - Logout")
                 # Queries
-                print("1 - Get a specific Feedback")  # Select 
-                print("2 - Get Feedback for an employee")  # Select 
-                print("3 - Get all Ratings for a dish")  # Project 
-                print("4 - Get Average rating for an Employee")  # Aggregate 
-                print("5 - Get Average rating for a Branch")  # Analysis - Join and Aggregate
-                print("6 - Get the Maximum or Minimum rating of a particular dish") # Analysis - Join and Agrregate
-                print("7 - Get the Supervisor of a Particular Employee") # Select
-                print("8 - Get Employees whose average rating is less than a given value X") # Analysis - Join and Agrregate
-                print("9 - Search using a partial match in suggestion") # Search
-                print("10 - Get all subordinates of a Particular Manager") # Select
+                print("1 - Get a specific Feedback")  # Select
+                print("2 - Get Feedback for an employee")  # Select
+                print("3 - Get all Ratings for a dish")  # Project
+                print("4 - Get Average rating for an Employee")  # Aggregate
+                print(
+                    "5 - Get Average rating for a Branch or Restaurant"
+                )  # Analysis - Join and Aggregate
+                print(
+                    "6 - Get the Maximum or Minimum rating of a particular dish"
+                )  # Analysis - Join and Agrregate
+                print("7 - Get the Supervisor of a Particular Employee")  # Select
+                print(
+                    "8 - Get Employees whose average rating is less than a given value X"
+                )  # Analysis - Join and Agrregate
+                print("9 - Search using a partial match in suggestion")  # Search
+                print("10 - Get all subordinates of a Particular Manager")  # Select
+                print(
+                    "11 - Get the average rating of a dish or the average rating given by a customer"
+                )  # Aggregate
                 # Updates
                 print("21 - Update the price of a Dish")  # Update
                 print("22 - Add an Employee")  # Insertion
                 print("23 - Add a Branch")  # Insertion
                 print("24 - Add a Restaurant")  # Insertion
                 print("25 - Add a Feedback")  # Insertion
-                
+
                 try:
                     ch = int(input("Enter choice> ").strip())
                 except TypeError:
@@ -465,5 +519,7 @@ while 1:
 
     except:
         tmp = sp.call("clear", shell=True)
-        print("Connection Refused: Either username or password is incorrect or user doesn't have access to database")
+        print(
+            "Connection Refused: Either username or password is incorrect or user doesn't have access to database"
+        )
         tmp = input("Enter any key to CONTINUE>")
