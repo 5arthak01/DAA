@@ -401,6 +401,85 @@ def avg_rating_branch_and_restaurant():  # Finds average rating for a Branch
     return
 
 
+def delete_dish():  # Delete a Dish
+    try:
+        dish = input("Enter Dish to be Deleted: ").strip()
+
+        cur.execute("DELETE FROM Dish_meal WHERE Dish_name = %s", (dish))
+        cur.execute("DELETE FROM Dish WHERE Dish_name = %s", (dish))
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except Exception as e:
+        con.rollback()
+        print(e)
+        print("-" * 10)
+
+    return
+
+
+def max_min_employee_rating_given_branch():  # Get Maximum or Minimum Rated Employee for a Branch
+    try:
+        choice = input(
+            "Enter 'Min' or 'Max' for Minimum or Maximum rating respectively: "
+        ).strip()
+        branch = input("Enter Branch: ").strip()
+
+        if choice == "Max":
+            cur.execute(
+                "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
+                (branch,),
+            )
+            rows = cur.fetchall()
+            max = 0
+            counter = 0
+            pointer = 0
+            for row in rows:
+                if row["Avg(Feedback.Rating)"] > max:
+                    pointer = counter
+                    max = row["Avg(Feedback.Rating)"]
+                counter += 1
+            for i in rows:
+                if i["Avg(Feedback.Rating)"] == max:
+                    print(i)
+
+        elif choice == "Min":
+            cur.execute(
+                "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
+                (branch,),
+            )
+            rows = cur.fetchall()
+            min = 11
+            counter = 0
+            pointer = 0
+            for row in rows:
+                if row["Avg(Feedback.Rating)"] < min:
+                    pointer = counter
+                    min = row["Avg(Feedback.Rating)"]
+                counter += 1
+            for i in rows:
+                if i["Avg(Feedback.Rating)"] == min:
+                    print(i)
+
+        else:
+            print("Invalid Input")
+
+        rows = cur.fetchall()
+        for row in rows:
+            print(row)
+        con.commit()
+        print()
+
+    except MySQLError as e:
+        con.rollback()
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
+        print("-" * 10)
+    return
+
+
 # -------------------------------------------------------------------------------
 # End of Functionalities
 
@@ -431,6 +510,8 @@ def dispatch(ch):
         get_subordinate()
     elif ch == 11:
         avg_dish_and_customer_ratings()
+    elif ch == 12:
+        max_min_employee_rating_given_branch()
     elif ch == 21:
         update_dish_price()
     elif ch == 22:
@@ -441,6 +522,8 @@ def dispatch(ch):
         insert_restaurant()
     elif ch == 25:
         insert_feedback()
+    elif(ch == 26):
+        delete_dish()
     else:
         print("Error: Invalid Option")
 
@@ -497,12 +580,14 @@ while 1:
                 print(
                     "11 - Get the average rating of a dish or the average rating given by a customer"
                 )  # Aggregate
+                print( "12 - Get Highest and Lowest Rated Employees of a Given Branch")  # Analysis - Join and Aggregate
                 # Updates
                 print("21 - Update the price of a Dish")  # Update
                 print("22 - Add an Employee")  # Insertion
                 print("23 - Add a Branch")  # Insertion
                 print("24 - Add a Restaurant")  # Insertion
                 print("25 - Add a Feedback")  # Insertion
+                print("26 - Delete a Dish")  # Delete
 
                 try:
                     ch = int(input("Enter choice> ").strip())
