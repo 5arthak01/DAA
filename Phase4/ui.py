@@ -413,9 +413,9 @@ def delete_dish():  # Delete a Dish
         con.commit()
         print()
 
-    except Exception as e:
+    except MySQLError as e:
         con.rollback()
-        print(e)
+        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
         print("-" * 10)
 
     return
@@ -427,51 +427,32 @@ def max_min_employee_rating_given_branch():  # Get Maximum or Minimum Rated Empl
             "Enter 'Min' or 'Max' for Minimum or Maximum rating respectively: "
         ).strip()
         branch = input("Enter Branch: ").strip()
-
-        if choice == "Max":
-            cur.execute(
-                "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
-                (branch,),
-            )
+        cur.execute(
+            "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
+            (branch,),
+        )
+        choice_dict = {"Max": 0, "Min": 1}
+        if choice == "Max" or choice == "Min":
             rows = cur.fetchall()
-            max = 0
+            if choice == "Max":
+                max = 0
+            elif choice == "Min":
+                max = 11
             counter = 0
             pointer = 0
             for row in rows:
-                if row["Avg(Feedback.Rating)"] > max:
+                if (row["Avg(Feedback.Rating)"] > max) ^ choice_dict[choice]:
                     pointer = counter
                     max = row["Avg(Feedback.Rating)"]
                 counter += 1
             for i in rows:
                 if i["Avg(Feedback.Rating)"] == max:
                     print(i)
-
-        elif choice == "Min":
-            cur.execute(
-                "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
-                (branch,),
-            )
-            rows = cur.fetchall()
-            min = 11
-            counter = 0
-            pointer = 0
-            for row in rows:
-                if row["Avg(Feedback.Rating)"] < min:
-                    pointer = counter
-                    min = row["Avg(Feedback.Rating)"]
-                counter += 1
-            for i in rows:
-                if i["Avg(Feedback.Rating)"] == min:
-                    print(i)
+            con.commit()
+            print()
 
         else:
             print("Invalid Input")
-
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
-        con.commit()
-        print()
 
     except MySQLError as e:
         con.rollback()
@@ -522,7 +503,7 @@ def dispatch(ch):
         insert_restaurant()
     elif ch == 25:
         insert_feedback()
-    elif(ch == 26):
+    elif ch == 26:
         delete_dish()
     else:
         print("Error: Invalid Option")
@@ -580,7 +561,9 @@ while 1:
                 print(
                     "11 - Get the average rating of a dish or the average rating given by a customer"
                 )  # Aggregate
-                print( "12 - Get Highest and Lowest Rated Employees of a Given Branch")  # Analysis - Join and Aggregate
+                print(
+                    "12 - Get Highest and Lowest Rated Employees of a Given Branch"
+                )  # Analysis - Join and Aggregate
                 # Updates
                 print("21 - Update the price of a Dish")  # Update
                 print("22 - Add an Employee")  # Insertion
