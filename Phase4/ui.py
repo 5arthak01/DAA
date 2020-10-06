@@ -427,17 +427,14 @@ def max_min_employee_rating_given_branch():  # Get Maximum or Minimum Rated Empl
             "Enter 'Min' or 'Max' for Minimum or Maximum rating respectively: "
         ).strip()
         branch = input("Enter Branch: ").strip()
-        cur.execute(
-            "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
-            (branch,),
-        )
         choice_dict = {"Max": 0, "Min": 1}
         if choice == "Max" or choice == "Min":
+            cur.execute(
+                "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
+                (branch,),
+            )
             rows = cur.fetchall()
-            if choice == "Max":
-                max = 0
-            elif choice == "Min":
-                max = 11
+            max = 0 if choice == "Max" else 11
             counter = 0
             pointer = 0
             for row in rows:
