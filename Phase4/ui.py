@@ -622,12 +622,12 @@ while 1:
 
     try:
         con = pymysql.connect(
-            host="172.17.0.2",  # OR set appropriate host
+            host="localhost",  # OR set appropriate host
             user=username,
             password=password,
             db="Restaurant_Ratings",  # Name of our Database
             cursorclass=pymysql.cursors.DictCursor,
-            port=3306,  # Since our docker container hosts mysql server at this port
+            port=5005,  # Since our docker container hosts mysql server at this port
         )
         tmp = sp.call("clear", shell=True)
 
