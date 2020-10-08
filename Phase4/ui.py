@@ -572,11 +572,11 @@ while 1:
                 )  # Analysis - Join and Aggregate
                 print(
                     "6 - Get the Maximum or Minimum rating of a particular dish"
-                )  # Analysis - Join and Agrregate
+                )  # Analysis - Join and Aggregate
                 print("7 - Get the Supervisor of a Particular Employee")  # Select
                 print(
                     "8 - Get Employees whose average rating is less than a given value X"
-                )  # Analysis - Join and Agrregate
+                )  # Analysis - Join and Aggregate
                 print("9 - Search using a partial match in suggestion")  # Search
                 print("10 - Get all subordinates of a Particular Manager")  # Select
                 print(
