@@ -2,6 +2,7 @@ import subprocess as sp
 import pymysql
 import pymysql.err
 import pymysql.cursors
+from pymysql import MySQLError
 from prettytable import PrettyTable
 
 """
@@ -79,7 +80,7 @@ def employee_feedback():  # Finds all records in Feedback for given employee
             t.add_row(row.values())
         print(t)
         con.commit()
-        print
+        print()
 
     except MySQLError as e:
         con.rollback()
@@ -157,9 +158,10 @@ def employees_less_than_x():  # Employees with average rating less than given nu
         x = input("Enter x: ").strip()
         try:
             x = float(x)
-        except TypeError:
-            print("Please enter a natural number")
-            raise
+        except ValueError:
+            print("Please enter a valid number")
+            return
+        
 
         t = PrettyTable(["Employee Id", "Average Rating"])
         cur.execute(
@@ -184,11 +186,11 @@ def employees_less_than_x():  # Employees with average rating less than given nu
 def max_min_dish_rating():  # Finds minimum or maximum rating for given Dish
     try:
         choice = input(
-            "Enter 'MIN' or 'MAX' for Minimum or Maximum rating respectively: "
+            "Enter 'Min' or 'Max' for Minimum or Maximum rating respectively: "
         ).strip()
-        dish = input("Enter Dish name: ").strip()
 
-        if choice == "MAX" or choice == "MIN":
+        if choice == "Max" or choice == "Min":
+            dish = input("Enter Dish name: ").strip()
             cur.execute(
                 f"SELECT {choice}(Rating) from Feedback where Dish_name=%s", (dish,)
             )
@@ -217,9 +219,9 @@ def update_dish_price():  # Updates price of a dish
         price = input("Enter New price: ").strip()
         try:
             price = int(price)
-        except TypeError:
-            print("Please enter a natural number")
-            raise
+        except ValueError:
+            print("Please enter a number for the price")
+            return
 
         cur.execute("UPDATE Dish SET Price=%s WHERE Dish_name=%s", (price, dish))
         con.commit()
@@ -449,9 +451,10 @@ def max_min_employee_rating_given_branch():  # Get Maximum or Minimum Rated Empl
         choice = input(
             "Enter 'Min' or 'Max' for Minimum or Maximum rating respectively: "
         ).strip()
-        branch = input("Enter Branch: ").strip()
+        
         choice_dict = {"Max": 0, "Min": 1}
         if choice == "Max" or choice == "Min":
+            branch = input("Enter Branch: ").strip()
             t = PrettyTable(["Employee ID", "Average Rating"])
             cur.execute(
                 "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
@@ -541,12 +544,12 @@ while 1:
 
     try:
         con = pymysql.connect(
-            host="localhost",  # OR set appropriate host
+            host="172.17.0.2",  # OR set appropriate host
             user=username,
             password=password,
             db="Restaurant_Ratings",  # Name of our Database
             cursorclass=pymysql.cursors.DictCursor,
-            port=5005,  # Since our docker container hosts mysql server at this port
+            port=3306,  # Since our docker container hosts mysql server at this port
         )
         tmp = sp.call("clear", shell=True)
 
