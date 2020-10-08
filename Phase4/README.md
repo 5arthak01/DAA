@@ -23,12 +23,12 @@ source Dump.sql;
 Due to this, you may have to make changes in the host and/or port arguments.
 ```python
 con = pymysql.connect(
-            host="172.17.0.2",  # OR set appropriate host
+            host="localhost",  # OR set appropriate host
             user=username,
             password=password,
             db="Restaurant_Ratings",  # Name of our Database
             cursorclass=pymysql.cursors.DictCursor,
-            port=3306,  # Since our docker container hosts mysql server at this port
+            port=5005,  # Since our docker container hosts mysql server at this port
         )
 ```
 5. Now you are all set to run the file! Run in terminal:
