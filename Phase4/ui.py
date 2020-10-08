@@ -1,6 +1,5 @@
 import subprocess as sp
 import pymysql
-import pymysql.err
 import pymysql.cursors
 from pymysql import MySQLError
 from prettytable import PrettyTable
@@ -51,8 +50,13 @@ def get_feedback():  # Finds specific record in Feedback
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -84,8 +88,13 @@ def employee_feedback():  # Finds all records in Feedback for given employee
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -104,8 +113,13 @@ def dish_rating():  # Finds all ratings in Feedback for given dish
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -127,8 +141,13 @@ def avg_emp_rating():  # Finds average rating for given Employee
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -147,8 +166,13 @@ def employee_super():  # Finds the supervisor of an Employee
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -159,9 +183,8 @@ def employees_less_than_x():  # Employees with average rating less than given nu
         try:
             x = float(x)
         except ValueError:
-            print("Please enter a valid number")
+            print("Please enter a valid decimal")
             return
-        
 
         t = PrettyTable(["Employee Id", "Average Rating"])
         cur.execute(
@@ -177,8 +200,13 @@ def employees_less_than_x():  # Employees with average rating less than given nu
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -207,8 +235,13 @@ def max_min_dish_rating():  # Finds minimum or maximum rating for given Dish
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -220,7 +253,7 @@ def update_dish_price():  # Updates price of a dish
         try:
             price = int(price)
         except ValueError:
-            print("Please enter a number for the price")
+            print("Please enter a valid number for the Price")
             return
 
         cur.execute("UPDATE Dish SET Price=%s WHERE Dish_name=%s", (price, dish))
@@ -229,8 +262,13 @@ def update_dish_price():  # Updates price of a dish
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -288,8 +326,13 @@ def insert_employee():  # Add an Employee
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -307,8 +350,13 @@ def insert_branch():  # Add a Branch
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -326,8 +374,13 @@ def insert_restaurant():  # Add a Restaurant
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -354,8 +407,13 @@ def insert_feedback():  # Add a Feedback
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -386,8 +444,13 @@ def avg_dish_and_customer_ratings():  # Gives Average Rating of Dish and Average
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -423,8 +486,13 @@ def avg_rating_branch_and_restaurant():  # Finds average rating for a Branch
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
     return
 
 
@@ -440,8 +508,13 @@ def delete_dish():  # Delete a Dish
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
 
     return
 
@@ -451,7 +524,7 @@ def max_min_employee_rating_given_branch():  # Get Maximum or Minimum Rated Empl
         choice = input(
             "Enter 'Min' or 'Max' for Minimum or Maximum rating respectively: "
         ).strip()
-        
+
         choice_dict = {"Max": 0, "Min": 1}
         if choice == "Max" or choice == "Min":
             branch = input("Enter Branch: ").strip()
@@ -481,8 +554,13 @@ def max_min_employee_rating_given_branch():  # Get Maximum or Minimum Rated Empl
 
     except MySQLError as e:
         con.rollback()
-        print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
-        print("-" * 10)
+        print("\n\n" + "-" * 20)
+        print(
+            " Encountered database error.\n Error number {} - {}".format(
+                e.args[0], e.args[1]
+            )
+        )
+        print("-" * 20 + "\n\n")
     return
 
 
@@ -589,6 +667,8 @@ while 1:
                 print(
                     "12 - Get Highest and Lowest Rated Employees of a Given Branch"
                 )  # Analysis - Join and Aggregate
+
+                print()
                 # Updates
                 print("21 - Update the price of a Dish")  # Update
                 print("22 - Add an Employee")  # Insertion
