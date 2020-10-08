@@ -2,6 +2,7 @@ import subprocess as sp
 import pymysql
 import pymysql.err
 import pymysql.cursors
+from prettytable import PrettyTable
 
 """
 Functions for different options
@@ -18,6 +19,8 @@ def get_feedback():  # Finds specific record in Feedback
         entry["Phone"] = input("Phone: ").strip()
         entry["Entry_time"] = input("Time as YYYY-MM-DD HH:MM:SS ").strip()
 
+        t = PrettyTable(['Waiter_id','Chef_id','Dish_name','Phone','Entry_time','Suggestion','Rating'])
+
         cur.execute(
             "SELECT * FROM Feedback WHERE Waiter_id=%s AND Chef_id=%s AND Dish_name=%s AND Phone=%s AND Entry_time=%s",
             (
@@ -30,7 +33,8 @@ def get_feedback():  # Finds specific record in Feedback
         )
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -38,6 +42,7 @@ def get_feedback():  # Finds specific record in Feedback
         con.rollback()
         print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
         print("-" * 10)
+
 
     return
 
@@ -45,21 +50,25 @@ def get_feedback():  # Finds specific record in Feedback
 def employee_feedback():  # Finds all records in Feedback for given employee
     try:
         employee = input("Enter EmployeeID: ").strip()
-
+        t = PrettyTable(['Waiter_id','Chef_id','Dish_name','Phone','Entry_time','Suggestion','Rating'])
         cur.execute(
             "SELECT * FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s",
             (employee, employee),
         )
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            t.add_row(row.values())
+        print(t)
         con.commit()
-        print()
+        print
+
 
     except MySQLError as e:
         con.rollback()
         print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
         print("-" * 10)
+
+
 
     return
 
@@ -67,11 +76,12 @@ def employee_feedback():  # Finds all records in Feedback for given employee
 def dish_rating():  # Finds all ratings in Feedback for given dish
     try:
         dish = input("Enter Dish name: ").strip()
-
+        t = PrettyTable(['Rating'])
         cur.execute("SELECT Rating FROM Feedback WHERE Dish_name=%s", (dish,))
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -86,14 +96,15 @@ def dish_rating():  # Finds all ratings in Feedback for given dish
 def avg_emp_rating():  # Finds average rating for given Employee
     try:
         employee = input("Enter Employee ID: ").strip()
-
+        t = PrettyTable(['Average Rating'])
         cur.execute(
             "SELECT Avg(Rating) FROM Feedback WHERE Waiter_id=%s OR Chef_id=%s",
             (employee, employee),
         )
         rows = cur.fetchall()
-        print(rows)
-
+        for row in rows:
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -107,11 +118,13 @@ def avg_emp_rating():  # Finds average rating for given Employee
 
 def employee_super():  # Finds the supervisor of an Employee
     try:
-        employee = input("Enter Employee ID: ").strip()
-        cur.execute("SELECT Super_id from Employee where Employee_id=%s", (employee,))
+        emp = input("Enter Employee ID: ").strip()
+        t = PrettyTable(['Supervisor ID'])
+        cur.execute("SELECT Super_id from Employee where Employee_id=%s", (emp,))
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -127,18 +140,20 @@ def employees_less_than_x():  # Employees with average rating less than given nu
     try:
         x = input("Enter x: ").strip()
         try:
-            x = int(x)
+            x = float(x)
         except TypeError:
             print("Please enter a natural number")
             raise
 
+        t = PrettyTable(['Employee Id','Average Rating'])
         cur.execute(
             "SELECT Employee.Employee_id,Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) group by Employee_id having Avg(Feedback.Rating)<%s",
             (x,),
         )
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -164,10 +179,11 @@ def max_min_dish_rating():  # Finds minimum or maximum rating for given Dish
         else:
             print("Invalid Input")
             return
-
+        t = PrettyTable([f'{choice} Rating'])
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -190,9 +206,6 @@ def update_dish_price():  # Updates price of a dish
             raise
 
         cur.execute("UPDATE Dish SET Price=%s WHERE Dish_name=%s", (price, dish))
-        rows = cur.fetchall()
-        for row in rows:
-            print(row)
         con.commit()
         print()
 
@@ -208,10 +221,12 @@ def search_suggestion():
     try:
         search = input("Enter what you are searching for: ").strip()
         query = """SELECT Suggestion FROM Feedback WHERE Suggestion LIKE %s"""
+        t = PrettyTable(['Suggestion'])
         cur.execute(query, ("%" + search + "%",))
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -224,10 +239,12 @@ def search_suggestion():
 def get_subordinate():
     try:
         manager = input("Enter the Manager ID: ").strip()
+        t = PrettyTable(['Employee ID'])
         cur.execute("SELECT Employee_id FROM Employee where Super_id = %s", (manager,))
         rows = cur.fetchall()
         for row in rows:
-            print(row)
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -352,11 +369,12 @@ def avg_dish_and_customer_ratings():
         else:
             print("Invalid Input")
             return
-
+        t = PrettyTable(['Average Rating'])
         cur.execute(f"SELECT AVG(Rating) FROM Feedback WHERE {choice}=%s", (inp,))
         rows = cur.fetchall()
-        print(rows)
-
+        for row in rows:
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -364,6 +382,7 @@ def avg_dish_and_customer_ratings():
         con.rollback()
         print("Encountered Database error {!r}, Error number- {}".format(e, e.args[0]))
         print("-" * 10)
+
     return
 
 
@@ -384,13 +403,15 @@ def avg_rating_branch_and_restaurant():  # Finds average rating for a Branch
             print("Invalid Input")
             return
 
+        t = PrettyTable(['Average Rating'])
         cur.execute(
             f"SELECT Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id = Feedback.Chef_id) WHERE Employee.{choice}=%s",
             (inp,),
         )
         rows = cur.fetchall()
-        print(rows)
-
+        for row in rows:
+            t.add_row(row.values())
+        print(t)
         con.commit()
         print()
 
@@ -406,6 +427,7 @@ def delete_dish():  # Delete a Dish
         dish = input("Enter Dish to be Deleted: ").strip()
 
         cur.execute("DELETE FROM Dish_meal WHERE Dish_name = %s", (dish))
+        cur.execute("DELETE FROM Feedback WHERE Dish_name = %s", (dish))
         cur.execute("DELETE FROM Dish WHERE Dish_name = %s", (dish))
         rows = cur.fetchall()
         for row in rows:
@@ -429,6 +451,7 @@ def max_min_employee_rating_given_branch():  # Get Maximum or Minimum Rated Empl
         branch = input("Enter Branch: ").strip()
         choice_dict = {"Max": 0, "Min": 1}
         if choice == "Max" or choice == "Min":
+            t = PrettyTable(['Employee ID', 'Average Rating'])
             cur.execute(
                 "SELECT Employee.Employee_id, Avg(Feedback.Rating) FROM Employee INNER JOIN Feedback ON (Employee.Employee_id = Feedback.Waiter_id OR Employee.Employee_id=Feedback.Chef_id) WHERE Employee.Branch_id = %s group by Employee.Employee_id",
                 (branch,),
@@ -444,7 +467,8 @@ def max_min_employee_rating_given_branch():  # Get Maximum or Minimum Rated Empl
                 counter += 1
             for i in rows:
                 if i["Avg(Feedback.Rating)"] == max:
-                    print(i)
+                    t.add_row(i.values())
+            print(t)
             con.commit()
             print()
 
@@ -548,11 +572,11 @@ while 1:
                 )  # Analysis - Join and Aggregate
                 print(
                     "6 - Get the Maximum or Minimum rating of a particular dish"
-                )  # Analysis - Join and Aggregate
+                )  # Analysis - Join and Agrregate
                 print("7 - Get the Supervisor of a Particular Employee")  # Select
                 print(
                     "8 - Get Employees whose average rating is less than a given value X"
-                )  # Analysis - Join and Aggregate
+                )  # Analysis - Join and Agrregate
                 print("9 - Search using a partial match in suggestion")  # Search
                 print("10 - Get all subordinates of a Particular Manager")  # Select
                 print(
@@ -588,3 +612,4 @@ while 1:
             "Connection Refused: Either username or password is incorrect or user doesn't have access to database"
         )
         tmp = input("Enter any key to CONTINUE>")
+        
