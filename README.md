@@ -4,16 +4,16 @@
 * Python3 >=3.5
 * PyMySQL
 ```
-pip install PyMySQL
+$ pip install PyMySQL
 ```
 * prettytable
 ```
-pip install prettytable
+$ pip install prettytable
 ```
 
 # Instructions
 
-1. Make sure you are in the folder.
+1. Make sure you are in the cloned folder.
 2. Run your MySQL server. Now run the following to import the database.
 ```sql
 source Dump.sql;
@@ -33,5 +33,5 @@ con = pymysql.connect(
 ```
 5. Now you are all set to run the file! Run in terminal:
 ```
-python ui.py
+$ python ui.py
 ```
